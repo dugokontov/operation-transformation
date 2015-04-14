@@ -165,7 +165,7 @@ var OT = (function () {
         }
       }
     }
-    console.log(request.action, data, states, log);
+    console.log(JSON.stringify(request));
   };
 
   return OT;

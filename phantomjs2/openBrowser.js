@@ -1,38 +1,75 @@
-/*global phantom, React*/
+/*global phantom, React, $, performance*/
 'use strict';
 var page = require('webpage').create(),
   t, address;
 
-var actionIndex = 0;
-
+var timeMeasure = {};
+var actionIndex = -1;
+var timeBetweenActions = 150;
+var clinetID;
 var actions = [{
-  tr: 0,
-  td: 1,
-  value: 33245
+  selector: 'table tbody tr:eq(1) td:eq(0) input',
+  action: 'focus'
 }, {
-  tr: 0,
-  td: 1,
-  value: 'Proba'
+  selector: 'table tbody tr:eq(1) td:eq(0) input',
+  action: 'change',
+  params: {
+    target: {
+      value: 101121
+    }
+  }
 }, {
-  tr: 0,
-  td: 1,
-  value: 'Sadrzaj'
+  selector: 'table tbody tr:eq(1) td:eq(0) input',
+  action: 'blur'
 }, {
-  tr: 0,
-  td: 1,
-  value: 892161
+  selector: 'table tbody tr:eq(2) td:eq(2) input',
+  action: 'focus'
 }, {
-  tr: 0,
-  td: 1,
-  value: 11211
+  selector: 'table tbody tr:eq(2) td:eq(2) input',
+  action: 'change',
+  params: {
+    target: {
+      value: 99131
+    }
+  }
 }, {
-  tr: 0,
-  td: 1,
-  value: 33211
+  selector: 'table tbody tr:eq(2) td:eq(2) input',
+  action: 'blur'
 }, {
-  tr: 0,
-  td: 1,
-  value: 10101010
+  selector: 'table tbody tr:eq(0) td:eq(1) input',
+  action: 'focus'
+}, {
+  selector: 'table tbody tr:eq(0) td:eq(1) input',
+  action: 'change',
+  params: {
+    target: {
+      value: 1
+    }
+  }
+}, {
+  selector: 'table tbody tr:eq(0) td:eq(1) input',
+  action: 'blur'
+}, {
+  selector: 'table tbody tr:eq(1) td:eq(0) input',
+  action: 'focus'
+}, {
+  selector: 'table tbody tr:eq(1) td:eq(0) input',
+  action: 'change',
+  params: {
+    target: {
+      value: 'Centar'
+    }
+  }
+}, {
+  selector: 'table tbody tr:eq(1) td:eq(0) input',
+  action: 'blur'
+}, {
+  selector: '#rowPosition',
+  jQueryAction: 'val',
+  params: '0'
+}, {
+  selector: '#add-row',
+  action: 'click'
 }];
 
 t = Date.now();
@@ -48,36 +85,58 @@ page.open(address, function (status) {
 });
 
 var runNextAction = function () {
+  actionIndex += 1;
   setTimeout(function () {
     if (actionIndex < actions.length) {
       page.evaluate(function (action) {
-        var element = document.querySelectorAll('table tbody tr')[action.tr];
-        element = element.querySelectorAll('td')[action.td];
-        element = element.querySelector('input');
-
-        React.addons.TestUtils.Simulate.focus(element);
-        React.addons.TestUtils.Simulate.change(element, {
-          target: {
-            value: action.value
-          }
-        });
-        React.addons.TestUtils.Simulate.blur(element);
+        var element = $(action.selector);
+        if (action.jQueryAction) {
+          element[action.jQueryAction](action.params);
+        } else {
+          element = element[0];
+          React.addons.TestUtils.Simulate[action.action](element, action.params);
+        }
       }, actions[actionIndex]);
-      actionIndex += 1;
+      runNextAction();
     } else {
-      phantom.exit();
+      giveStatistic(timeMeasure);
     }
-  }, 500);
+  }, timeBetweenActions);
 };
 
 page.onConsoleMessage = function (msg) {
-  console.log('CL', msg);
-  var action = 'new-user';
-  if (msg.slice(0, action.length) === action) {
+  if (msg[0] === '{') {
+    var when = performance.now();
+    msg = JSON.parse(msg);
+    if (msg.action === 'init') {
+      clinetID = msg.value.priority;
+    } else if (msg.priority === clinetID && msg.action !== 'user-change-position') {
+      var hash = msg.states.toString();
+      if (!timeMeasure[hash]) {
+        timeMeasure[hash] = {
+          start: when,
+          action: msg
+        };
+      } else {
+        timeMeasure[hash].stop = when;
+      }
+    }
+  }
+  // console.log(msg);
+  if (actionIndex === -1 && msg.action === 'new-user') {
     runNextAction();
   }
-  action = 'updateCell';
-  if (msg.slice(0, action.length) === action) {
-    runNextAction();
-  }
+};
+
+var giveStatistic = function () {
+  var stats = Object
+    .keys(timeMeasure)
+    .map(function (hash) {
+      var action = timeMeasure[hash];
+      return [action.stop - action.start, action.action.action].join();
+    }).join('\n');
+
+  var fs = require('fs');
+  fs.write(clinetID + '-test-results.csv', stats, 'w');
+  phantom.exit();
 };

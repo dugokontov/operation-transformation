@@ -49,16 +49,14 @@ class TableStore extends GLU.Store {
     return ot.getUsersPostion();
   }
 
-  triggerRequest(action, payload, shouldSkip) {
+  triggerRequest(action, payload, skipExecute) {
     var message = ot.createMessage(action, payload);
     var request = JSON.parse(message);
-    if (!shouldSkip) {
+    if (!skipExecute) {
+      console.log(JSON.stringify(request));
       ot.execute(request);
     }
     socket.send(message);
-    if (action === TableActions.UPDATE_CELL) {
-      console.log(new Date().getTime(), payload);
-    }
     this.emitChange();
   }
 

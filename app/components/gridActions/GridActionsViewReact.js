@@ -14,9 +14,9 @@ var GridViewReact = React.createClass({
   },
   render(): any {
     return <div>
-      <button onClick={this.addRow}>Add new row</button>
-      <button onClick={this.deleteRow}>Remove row</button>
-      <input type="text" defaultValue="1" ref="rowPosition" />
+      <button id="add-row" onClick={this.addRow}>Add new row</button>
+      <button id="remove-row" onClick={this.deleteRow}>Remove row</button>
+      <input id="rowPosition" type="text" defaultValue="1" ref="rowPosition" />
     </div>;
   }
 });
