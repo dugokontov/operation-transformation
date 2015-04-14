@@ -99,7 +99,7 @@ var runNextAction = function () {
       }, actions[actionIndex]);
       runNextAction();
     } else {
-      giveStatistic(timeMeasure);
+      setTimeout(giveStatistic, 2000);
     }
   }, timeBetweenActions);
 };
@@ -122,7 +122,6 @@ page.onConsoleMessage = function (msg) {
       }
     }
   }
-  // console.log(msg);
   if (actionIndex === -1 && msg.action === 'new-user') {
     runNextAction();
   }
@@ -138,5 +137,6 @@ var giveStatistic = function () {
 
   var fs = require('fs');
   fs.write(clinetID + '-test-results.csv', stats, 'w');
+  page.render(clinetID + '-page.png');
   phantom.exit();
 };
