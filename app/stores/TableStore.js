@@ -20,7 +20,7 @@ class TableStore extends GLU.Store {
   }
 
   init() {
-    socket = new WebSocket('ws://localhost:8080', 'protocolOne');
+    socket = new WebSocket('ws://' + window.location.hostname + ':8080', 'protocolOne');
     var self = this;
     var emitChange = function () {
       self.emitChange();
@@ -49,11 +49,16 @@ class TableStore extends GLU.Store {
     return ot.getUsersPostion();
   }
 
-  triggerRequest(action, payload) {
+  triggerRequest(action, payload, shouldSkip) {
     var message = ot.createMessage(action, payload);
     var request = JSON.parse(message);
-    ot.execute(request);
+    if (!shouldSkip) {
+      ot.execute(request);
+    }
     socket.send(message);
+    if (action === TableActions.UPDATE_CELL) {
+      console.log(new Date().getTime(), payload);
+    }
     this.emitChange();
   }
 
@@ -70,7 +75,7 @@ class TableStore extends GLU.Store {
   }
 
   userChangePosition(payload) {
-    this.triggerRequest(TableActions.USER_CHANGE_POSITION, payload);
+    this.triggerRequest(TableActions.USER_CHANGE_POSITION, payload, true);
   }
 }
 

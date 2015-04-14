@@ -81,7 +81,6 @@ var OT = (function () {
 
   OT.prototype.execute = execute;
 
-
   OT.prototype.markAsNoOp = function (request) {
     request.originalAction = request.action;
     request.action = 'no-op';
