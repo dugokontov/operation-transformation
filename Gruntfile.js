@@ -73,7 +73,7 @@ module.exports = function (grunt) {
                 template: "template.html",
                 destFile: "demo/index.html",
                 ignorePath: 'demo/',
-                addRootSlash: false
+                addRootSlash: true
             },
             local_dependencies: {
                 files: {
