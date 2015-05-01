@@ -9,7 +9,7 @@ class ProjectsView extends GLU.View {
 
     onViewRender() {
       let projects = this.projects.map(project => <li>
-          <Link href={`/project/${project.id}`}>{project.title}</Link>
+          <Link href={`/project/${project.id}`}>{project.alias}</Link>
         </li>);
       React.render(
         <ul>{projects}</ul>, this.el);

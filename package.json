@@ -26,6 +26,7 @@
     "open": "~0.0.5",
     "react": "~0.13.1",
     "through": "^2.3.6",
+    "ws": "^0.7.1",
     "yuidocjs": "^0.6.0"
   },
   "dependencies": {

@@ -26,6 +26,10 @@ OT.prototype.setStates = function (s) {
   states = s;
 };
 
+OT.prototype.getStates = function () {
+  return states;
+};
+
 OT.prototype.getPriority = function () {
   return priority;
 };

@@ -7,10 +7,10 @@ class ProjectView extends GLU.View {
     }
 
     onViewRender() {
-        if (this.project) {
+        if (this.data) {
             React.render(
               <div>
-                {this.project.title}
+                {this.data}
               </div>, this.el);
         }
     }

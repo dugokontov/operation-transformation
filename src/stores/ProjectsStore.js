@@ -1,6 +1,8 @@
 import GLU from 'glu.js';
 import request from 'superagent';
 import ProjectsActions from '/actions/ProjectsActions';
+import TableActions from '/actions/TableActions';
+import OT from '../../ot/ot';
 
 class ProjectsStore extends GLU.Store {
     constructor() {
@@ -12,34 +14,13 @@ class ProjectsStore extends GLU.Store {
 
         this.bindActions(
             ProjectsActions.QUERY, this.query, [],
-            ProjectsActions.ADD_NEW, this.addNew, [],
-            ProjectsActions.GET_PROJECT, this.getProject, [],
-            ProjectsActions.DELETE_PROJECT, this.deleteProject, []
+            ProjectsActions.GET_PROJECT, this.getProject, []
         );
-    }
-
-    addNew(projectData) {
-        request
-            .post('https://dev-datahub.socialexplorer.com/vizwiz/Project')
-            .send(projectData)
-            .withCredentials()
-            .end((err, res) => {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                var project = res.body;
-                this._populateMissingIdentities([project])
-                    .then(() => {
-                        this._projects.unshift(res.body);
-                        this.emitChange();
-                    });
-            });
     }
 
     query(queryParams) {
         request
-            .get('https://dev-datahub.socialexplorer.com/vizwiz/Search/Project')
+            .get('https://dev-datahub.socialexplorer.com/data/Search/Table')
             .query(queryParams)
             .withCredentials()
             .end((err, res) => {
@@ -48,86 +29,30 @@ class ProjectsStore extends GLU.Store {
                     return;
                 }
                 this._projects = res.body;
-                this._populateMissingIdentities(this._projects)
-                    .then(() => this.emitChange());
+                this.emitChange();
             });
     }
 
     getProject(queryParams) {
-        request
-            .get(`https://dev-datahub.socialexplorer.com/vizwiz/Project/${queryParams.projectID}`)
-            .withCredentials()
-            .end((err, res) => {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                this._currentProject = res.body;
-                this._populateMissingIdentities([this._currentProject])
-                    .then(() => this.emitChange());
-            });
-    }
-
-    deleteProject(project) {
-        this._currentProject = null;
-        for (let i = 0; i < this._projects.length; i++) {
-            if(this._projects[i].id === project.id) {
-                this._projects.splice(i, 1);
-                break;
-            }
-        }
-
-        request
-            .del(`https://dev-datahub.socialexplorer.com/vizwiz/Project/${project.id}`)
-            .withCredentials()
-            .end((err) => {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-            });
-
-        this.emitChange();
-    }
-
-    _populateMissingIdentities(projects) {
-        let baseUrl = 'https://dev-datahub.socialexplorer.com/auth/Identity';
-        let needToGetOwnerIDs = [];
-        let alreadyCachedIdentites = Object
-            .keys(this._identities)
-            .map(key => +key);
-        projects.forEach(project => {
-            let notAlreadyCached = alreadyCachedIdentites.indexOf(project.ownerID) === -1;
-            let notAlreadyMarkedToGet = needToGetOwnerIDs.indexOf(project.ownerID) === -1;
-            let notAlreadyRetrieved = !project.owner;
-            if (notAlreadyRetrieved && notAlreadyCached && notAlreadyMarkedToGet) {
-                needToGetOwnerIDs.push(project.ownerID);
-            }
+        let socket = new WebSocket('ws://' + window.location.hostname + ':8080', queryParams.projectID);
+        socket.onmessage = (event) => this.ot.processRequest(event.data);
+        var emitChange = () => this.emitChange();
+        this.ot = new OT({
+            onInit: emitChange,
+            onUserPositionChange: emitChange
         });
-        let requests = needToGetOwnerIDs
-            .map(ownerID => {
-                let path = `${baseUrl}/${ownerID}`;
-                let promise = new Promise((resolve, reject) => {
-                    request
-                        .get(path)
-                        .withCredentials()
-                        .end((err, res) => {
-                            if (err) {
-                                reject(err);
-                            }
-                            resolve(res.body);
-                        });
-                });
-                return promise;
-            });
-        return Promise
-            .all(requests)
-            .then(identities => {
-                identities.forEach(identity => {
-                    this._identities[identity.id] = identity;
-                });
-                projects.forEach(project => project.owner = this._identities[project.ownerID]);
-            });
+
+        this.ot.onModelChange(TableActions.UPDATE_CELL, emitChange);
+        this.ot.onModelChange(TableActions.ADD_ROW, emitChange);
+        this.ot.onModelChange(TableActions.DELETE_ROW, emitChange);
+    }
+
+    get data() {
+        return this.ot.getData();
+    }
+
+    get usersPosition() {
+        return this.ot.getUsersPostion();
     }
 
     get projects() {

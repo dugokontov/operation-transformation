@@ -12,7 +12,7 @@ class ProjectViewController extends GLU.ViewController {
     }
 
     onStoreChange() {
-        this.view.project = ProjectsStore.currentProject;
+        this.view.data = ProjectsStore.data;
         this.view.render();
     }
 
