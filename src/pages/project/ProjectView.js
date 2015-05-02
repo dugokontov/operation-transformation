@@ -1,5 +1,6 @@
 import GLU from 'glu.js';
 import React from 'react';
+import GridViewReact from '/components/grid/GridViewReact';
 
 class ProjectView extends GLU.View {
     constructor(root, selector) {
@@ -8,10 +9,9 @@ class ProjectView extends GLU.View {
 
     onViewRender() {
         if (this.data) {
-            React.render(
-              <div>
-                {this.data}
-              </div>, this.el);
+            React.render(<GridViewReact
+                columns={this.data.columns}
+                data={this.data.data}/>, this.el);
         }
     }
 }
