@@ -11,7 +11,9 @@ class GridViewReact extends React.Component {
     let headers = this.props.columns.map(column => <th>{column.label}</th>);
     headers.unshift(<th>#</th>);
 
-    let rows = this.props.data.map(row => <RowViewReact row={row}/>);
+    let rows = this.props.data.map(row => <RowViewReact
+      row={row}
+      columns={this.props.columns}/>);
     return (
       <table>
         <thead>
