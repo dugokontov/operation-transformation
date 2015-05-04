@@ -1,6 +1,8 @@
 import GLU from 'glu.js';
 import ProjectsStore from '/stores/ProjectsStore';
 import ProjectsActionCreator from '/actions/ProjectsActionCreator';
+import TableActionCreator from '/actions/TableActionCreator';
+import TableActions from '/actions/TableActions';
 
 class ProjectViewController extends GLU.ViewController {
     constructor(view, params) {
@@ -9,6 +11,7 @@ class ProjectViewController extends GLU.ViewController {
         this.view.project = null;
         this.onParamsChange(params);
         ProjectsStore.onChange(this.onStoreChange, this);
+        this.view.on(TableActions.UPDATE_CELL, TableActionCreator.updateCell);
     }
 
     onStoreChange() {
@@ -24,6 +27,7 @@ class ProjectViewController extends GLU.ViewController {
 
     destroy() {
         ProjectsStore.offChange(this.onStoreChange);
+        this.view.off('updateCell', TableActionCreator.updateCell);
     }
 }
 

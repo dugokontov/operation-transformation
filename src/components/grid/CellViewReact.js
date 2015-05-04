@@ -4,7 +4,7 @@ import React from 'react';
 class CellViewReact extends React.Component {
   constructor(props) {
     super(props);
-    this.states = {
+    this.state = {
       value: this.props.cell
     };
   }
@@ -22,7 +22,14 @@ class CellViewReact extends React.Component {
   }
 
   onBlur(event) {
-    console.log(event.target.value, this.props.rowID, this.props.columnID);
+    if (event.target.value === this.props.cell) {
+      return;
+    }
+    this.props.onValueChange({
+      value: event.target.value,
+      rowID: this.props.rowID,
+      columnID: this.props.columnID
+    });
   }
 
   render() {

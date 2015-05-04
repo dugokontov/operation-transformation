@@ -7,4 +7,4 @@ var TableActions = {
   USER_CHANGE_POSITION: 'user-change-position'
 };
 
-module.exports = TableActions;
+export default TableActions;

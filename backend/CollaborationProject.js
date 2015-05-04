@@ -2,6 +2,7 @@
 'use strict';
 var initTable = require('./initTable');
 var OT = require('../ot/ot');
+var tableChangeRules = require('../ot/table');
 
 var onEverybodyOut, ot, priority;
 
@@ -11,6 +12,7 @@ var CollaborationProject = function (tableID, onEverybodyOutCallback) {
   this.clientsWaitingForData = [];
   onEverybodyOut = onEverybodyOutCallback;
   ot = new OT();
+  tableChangeRules(ot);
   ot.setStates([]);
   priority = 0;
 
@@ -26,6 +28,7 @@ var CollaborationProject = function (tableID, onEverybodyOutCallback) {
   };
 
   initTable.constructTable(tableID, onTableLoaded);
+  this.suscribeOnEvents();
 };
 
 CollaborationProject.prototype.addClient = function (client) {
@@ -37,6 +40,14 @@ CollaborationProject.prototype.addClient = function (client) {
   // suscribe on web socket events
   client.on('close', function () {
     that.removeClient(client);
+  });
+
+  client.on('message', function (message) {
+    ot.processRequest(message);
+    // TODO: put this in callback called after calling backend is done
+    that.clients.forEach(function (client) {
+      client.send(message);
+    });
   });
 
   // send data or add in waiting que
@@ -78,6 +89,15 @@ CollaborationProject.prototype.broadcast = function(message) {
   this.clients.forEach(function (client) {
     client.send(message);
   });
+};
+
+CollaborationProject.prototype.suscribeOnEvents = function() {
+  ot.onModelChange('updateCell', this.onUpdateCell.bind(this));
+};
+
+CollaborationProject.prototype.onUpdateCell = function(request) {
+  // TODO: implement call on backend
+  console.log('onUpdateCell', request.value);
 };
 
 exports.CollaborationProject = CollaborationProject;

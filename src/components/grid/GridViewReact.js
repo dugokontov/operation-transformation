@@ -13,7 +13,8 @@ class GridViewReact extends React.Component {
 
     let rows = this.props.data.map(row => <RowViewReact
       row={row}
-      columns={this.props.columns}/>);
+      columns={this.props.columns}
+      onValueChange={this.props.onValueChange}/>);
     return (
       <table>
         <thead>
