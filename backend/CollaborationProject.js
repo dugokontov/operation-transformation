@@ -1,6 +1,7 @@
 /*jslint node:true*/
 'use strict';
 var initTable = require('./initTable');
+var requester = require('./request');
 var OT = require('../ot/ot');
 var tableChangeRules = require('../ot/table');
 
@@ -97,7 +98,16 @@ CollaborationProject.prototype.suscribeOnEvents = function() {
 
 CollaborationProject.prototype.onUpdateCell = function(request) {
   // TODO: implement call on backend
-  console.log('onUpdateCell', request.value);
+  var actionData = request.value;
+  requester.getJSON({
+    method: 'POST',
+    path: 'Table/' + this.tableID + '/Cell/' + actionData.columnID + '/' + actionData.rowID,
+    body: {
+      value: actionData.value
+    }
+  }, function (response) {
+    console.log('in response we got:', response);
+  });
 };
 
 exports.CollaborationProject = CollaborationProject;

@@ -3,14 +3,19 @@
 var https = require('https');
 
 exports.getJSON = function (options, onSuccess, onError) {
-  var headers = options.headers || {};
-  if (!headers['Content-Type']) {
-    headers['Content-Type'] = 'application/json';
+  var headers = options.headers || {
+    'Content-Type': 'application/json',
+    'cookie': 'put-some-cookie'
+  };
+  var body;
+  if (options.body) {
+    body = JSON.stringify(options.body);
+    headers['Content-Length'] = body.length;
   }
   var settings = {
-    host: 'dev-datahub.socialexplorer.com' || options.host,
+    host: options.host || 'dev-datahub.socialexplorer.com',
     path: '/data/' + options.path,
-    method: 'GET' || options.method,
+    method: options.method || 'GET',
     headers:  headers
   };
   var req = https.request(settings, function (res) {
@@ -27,6 +32,10 @@ exports.getJSON = function (options, onSuccess, onError) {
   req.on('error', function (err) {
     onError(err);
   });
+
+  if (body) {
+    req.write(body);
+  }
 
   req.end();
 };
