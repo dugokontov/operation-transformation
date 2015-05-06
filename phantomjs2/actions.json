@@ -1,0 +1,57 @@
+[{
+  "selector": "table tbody tr:eq(1) td:eq(1) input",
+  "action": "focus"
+}, {
+  "selector": "table tbody tr:eq(1) td:eq(1) input",
+  "action": "change",
+  "params": {
+    "target": {
+      "value": 101121
+    }
+  }
+}, {
+  "selector": "table tbody tr:eq(1) td:eq(1) input",
+  "action": "blur"
+}, {
+  "selector": "table tbody tr:eq(2) td:eq(2) input",
+  "action": "focus"
+}, {
+  "selector": "table tbody tr:eq(2) td:eq(2) input",
+  "action": "change",
+  "params": {
+    "target": {
+      "value": 99131
+    }
+  }
+}, {
+  "selector": "table tbody tr:eq(2) td:eq(2) input",
+  "action": "blur"
+}, {
+  "selector": "table tbody tr:eq(0) td:eq(1) input",
+  "action": "focus"
+}, {
+  "selector": "table tbody tr:eq(0) td:eq(1) input",
+  "action": "change",
+  "params": {
+    "target": {
+      "value": 1
+    }
+  }
+}, {
+  "selector": "table tbody tr:eq(0) td:eq(1) input",
+  "action": "blur"
+}, {
+  "selector": "table tbody tr:eq(1) td:eq(1) input",
+  "action": "focus"
+}, {
+  "selector": "table tbody tr:eq(1) td:eq(1) input",
+  "action": "change",
+  "params": {
+    "target": {
+      "value": "Centar"
+    }
+  }
+}, {
+  "selector": "table tbody tr:eq(1) td:eq(1) input",
+  "action": "blur"
+}]

@@ -1,79 +1,16 @@
 /*global phantom, React, $, performance*/
 'use strict';
 var page = require('webpage').create(),
+  actions = require('./actions.json'),
   t, address;
 
 var timeMeasure = {};
 var actionIndex = -1;
 var timeBetweenActions = 150;
 var clinetID;
-var actions = [{
-  selector: 'table tbody tr:eq(1) td:eq(0) input',
-  action: 'focus'
-}, {
-  selector: 'table tbody tr:eq(1) td:eq(0) input',
-  action: 'change',
-  params: {
-    target: {
-      value: 101121
-    }
-  }
-}, {
-  selector: 'table tbody tr:eq(1) td:eq(0) input',
-  action: 'blur'
-}, {
-  selector: 'table tbody tr:eq(2) td:eq(2) input',
-  action: 'focus'
-}, {
-  selector: 'table tbody tr:eq(2) td:eq(2) input',
-  action: 'change',
-  params: {
-    target: {
-      value: 99131
-    }
-  }
-}, {
-  selector: 'table tbody tr:eq(2) td:eq(2) input',
-  action: 'blur'
-}, {
-  selector: 'table tbody tr:eq(0) td:eq(1) input',
-  action: 'focus'
-}, {
-  selector: 'table tbody tr:eq(0) td:eq(1) input',
-  action: 'change',
-  params: {
-    target: {
-      value: 1
-    }
-  }
-}, {
-  selector: 'table tbody tr:eq(0) td:eq(1) input',
-  action: 'blur'
-}, {
-  selector: 'table tbody tr:eq(1) td:eq(0) input',
-  action: 'focus'
-}, {
-  selector: 'table tbody tr:eq(1) td:eq(0) input',
-  action: 'change',
-  params: {
-    target: {
-      value: 'Centar'
-    }
-  }
-}, {
-  selector: 'table tbody tr:eq(1) td:eq(0) input',
-  action: 'blur'
-}, {
-  selector: '#rowPosition',
-  jQueryAction: 'val',
-  params: '0'
-}, {
-  selector: '#add-row',
-  action: 'click'
-}];
 
 t = Date.now();
-address = 'http://localhost:5555';
+address = 'http://localhost:5555/project/274';
 page.open(address, function (status) {
   if (status !== 'success') {
     console.log('FAIL to load the address');
@@ -105,11 +42,13 @@ var runNextAction = function () {
 };
 
 page.onConsoleMessage = function (msg) {
+  console.log(msg);
   if (msg[0] === '{') {
     var when = performance.now();
     msg = JSON.parse(msg);
     if (msg.action === 'init') {
       clinetID = msg.value.priority;
+      runNextAction();
     } else if (msg.priority === clinetID && msg.action !== 'user-change-position') {
       var hash = msg.states.toString();
       if (!timeMeasure[hash]) {
@@ -121,9 +60,6 @@ page.onConsoleMessage = function (msg) {
         timeMeasure[hash].stop = when;
       }
     }
-  }
-  if (actionIndex === -1 && msg.action === 'new-user') {
-    runNextAction();
   }
 };
 
