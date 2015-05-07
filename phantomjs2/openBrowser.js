@@ -1,4 +1,4 @@
-/*global phantom, React, $, performance*/
+/*global phantom, TestUtils, $, performance*/
 'use strict';
 var page = require('webpage').create(),
   actions = require('./actions.json'),
@@ -10,7 +10,7 @@ var timeBetweenActions = 150;
 var clinetID;
 
 t = Date.now();
-address = 'http://localhost:5555/project/274';
+address = 'http://localhost:5555/project/615';
 page.open(address, function (status) {
   if (status !== 'success') {
     console.log('FAIL to load the address');
@@ -31,7 +31,7 @@ var runNextAction = function () {
           element[action.jQueryAction](action.params);
         } else {
           element = element[0];
-          React.addons.TestUtils.Simulate[action.action](element, action.params);
+          TestUtils.Simulate[action.action](element, action.params);
         }
       }, actions[actionIndex]);
       runNextAction();
