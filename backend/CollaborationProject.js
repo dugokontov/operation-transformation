@@ -5,7 +5,7 @@ var requester = require('./request');
 var OT = require('../ot/ot');
 var tableChangeRules = require('../ot/table');
 
-var onEverybodyOut, ot, priority;
+var onEverybodyOut, ot;
 
 var CollaborationProject = function (tableID, onEverybodyOutCallback) {
   this.clients = [];
@@ -15,7 +15,7 @@ var CollaborationProject = function (tableID, onEverybodyOutCallback) {
   ot = new OT();
   tableChangeRules(ot);
   ot.setStates([]);
-  priority = 0;
+  this.priority = 0;
 
   var that = this;
 
@@ -34,7 +34,7 @@ var CollaborationProject = function (tableID, onEverybodyOutCallback) {
 
 CollaborationProject.prototype.addClient = function (client) {
   var states = ot.getStates();
-  states[priority] = 0;
+  states[this.priority] = 0;
   var that = this;
   this.clients.push(client);
 
@@ -52,14 +52,14 @@ CollaborationProject.prototype.addClient = function (client) {
   });
 
   // send data or add in waiting que
+  client.priority = this.priority;
   if (ot.getData()) {
     this.sendInit(client);
   } else {
     this.clientsWaitingForData.push(client);
   }
 
-  this.broadcast(ot.createMessage('new-user', priority));
-  priority += 1;
+  this.priority += 1;
 };
 
 CollaborationProject.prototype.removeClient = function (client) {
@@ -82,8 +82,9 @@ CollaborationProject.prototype.sendInit = function(client) {
   client.send(ot.createMessage('init', {
     data: ot.getData(),
     states: ot.getStates(),
-    priority: priority
+    priority: client.priority
   }));
+  this.broadcast(ot.createMessage('new-user', client.priority));
 };
 
 CollaborationProject.prototype.broadcast = function(message) {
