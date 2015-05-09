@@ -12,6 +12,14 @@ var usersPosition = {};
 
 var OT = function (o) {
   options = o || {};
+  onModelChangeEvents = {};
+  usersPosition = {};
+  transformationMatrix = {};
+  executeActions = {};
+  log = [];
+  states = [];
+  priority = undefined;
+  data = undefined;
 };
 
 OT.prototype.setData = function (d) {
