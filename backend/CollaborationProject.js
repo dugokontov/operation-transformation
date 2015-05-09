@@ -16,6 +16,7 @@ var CollaborationProject = function (tableID, onEverybodyOutCallback) {
   tableChangeRules(ot);
   ot.setStates([]);
   this.priority = 0;
+  this.timeMeasures = {};
 
   var that = this;
 
@@ -44,10 +45,15 @@ CollaborationProject.prototype.addClient = function (client) {
   });
 
   client.on('message', function (message) {
+    var when = process.hrtime();
+    var request = JSON.parse(message);
     ot.processRequest(message);
     // TODO: put this in callback called after calling backend is done
     that.clients.forEach(function (client) {
       client.send(message);
+      if (+client.priority === request.priority) {
+        that.measure(when, process.hrtime(), request);
+      }
     });
   });
 
@@ -74,6 +80,14 @@ CollaborationProject.prototype.removeClient = function (client) {
 };
 
 CollaborationProject.prototype.destroy = function() {
+  var that = this;
+  // write results
+  Object.keys(this.timeMeasures).forEach(function (hash) {
+    var elements = hash.split(',');
+    var clinetPriority = elements[0];
+    var status = elements.slice(1);
+    console.log(clinetPriority, status, that.timeMeasures[hash].action, that.timeMeasures[hash].time);
+  });
   ot.setData(null);
   onEverybodyOut(this.tableID);
 };
@@ -109,6 +123,18 @@ CollaborationProject.prototype.onUpdateCell = function(request) {
   }, function (response) {
     console.log('in response we got:', response);
   });
+};
+
+CollaborationProject.prototype.measure = function(start, end, request) {
+  var hash = request.priority + ',' + request.states.toString();
+  var seconds = end[0] - start[0];
+  var nanoseconds = end[1] - start[1];
+  var timePassed = nanoseconds / 1000000000.0;
+  timePassed += seconds;
+  this.timeMeasures[hash] = {
+    action: request.action,
+    time: timePassed
+  };
 };
 
 exports.CollaborationProject = CollaborationProject;
