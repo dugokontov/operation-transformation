@@ -1,2 +1,4 @@
 node_modules/
 demo/
+phantomjs2/*.png
+phantomjs2/*.csv

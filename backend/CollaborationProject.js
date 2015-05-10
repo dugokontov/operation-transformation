@@ -7,6 +7,10 @@ var tableChangeRules = require('../ot/table');
 
 var onEverybodyOut, ot;
 
+var hash = function (request) {
+  return request.priority + ',' + request.states.toString();
+};
+
 var CollaborationProject = function (tableID, onEverybodyOutCallback) {
   this.clients = [];
   this.tableID = tableID;
@@ -45,16 +49,8 @@ CollaborationProject.prototype.addClient = function (client) {
   });
 
   client.on('message', function (message) {
-    var when = process.hrtime();
-    var request = JSON.parse(message);
+    that.measureStart(JSON.parse(message));
     ot.processRequest(message);
-    // TODO: put this in callback called after calling backend is done
-    that.clients.forEach(function (client) {
-      client.send(message);
-      if (+client.priority === request.priority) {
-        that.measure(when, process.hrtime(), request);
-      }
-    });
   });
 
   // send data or add in waiting que
@@ -86,7 +82,7 @@ CollaborationProject.prototype.destroy = function() {
     var elements = hash.split(',');
     var clinetPriority = elements[0];
     var status = elements.slice(1);
-    console.log(clinetPriority, status, that.timeMeasures[hash].action, that.timeMeasures[hash].time);
+    console.log(clinetPriority, status, that.timeDiff(that.timeMeasures[hash]).toFixed(0));
   });
   ot.setData(null);
   onEverybodyOut(this.tableID);
@@ -112,8 +108,8 @@ CollaborationProject.prototype.suscribeOnEvents = function() {
 };
 
 CollaborationProject.prototype.onUpdateCell = function(request) {
-  // TODO: implement call on backend
   var actionData = request.value;
+  var that = this;
   requester.getJSON({
     method: 'POST',
     path: 'Table/' + this.tableID + '/Cell/' + actionData.columnID + '/' + actionData.rowID,
@@ -122,19 +118,40 @@ CollaborationProject.prototype.onUpdateCell = function(request) {
     }
   }, function (response) {
     console.log('in response we got:', response);
+    that.broadcast(JSON.stringify(request));
+    that.measureStop(request);
   });
 };
 
-CollaborationProject.prototype.measure = function(start, end, request) {
-  var hash = request.priority + ',' + request.states.toString();
-  var seconds = end[0] - start[0];
-  var nanoseconds = end[1] - start[1];
-  var timePassed = nanoseconds / 1000000000.0;
-  timePassed += seconds;
-  this.timeMeasures[hash] = {
+var newTimeInMiliseconds = function (time) {
+  var seconds = time[0];
+  var nanoseconds = time[1];
+  var timeInNanoseconds = nanoseconds / 1000000;
+  return timeInNanoseconds + (seconds * 1000);
+};
+
+CollaborationProject.prototype.timeDiff = function(timeMeasure) {
+  var oldTimeDiff = timeMeasure.stopOld - timeMeasure.startOld;
+  var newTimeStop = newTimeInMiliseconds(timeMeasure.stop);
+  var newTimeStart = newTimeInMiliseconds(timeMeasure.start);
+  var newTimeDiff = newTimeStop - newTimeStart;
+
+  return (oldTimeDiff + newTimeDiff) / 2;
+};
+
+CollaborationProject.prototype.measureStart = function(request) {
+  var key = hash(request);
+  this.timeMeasures[key] = {
     action: request.action,
-    time: timePassed
+    start: process.hrtime(),
+    startOld: new Date().getTime()
   };
+};
+
+CollaborationProject.prototype.measureStop = function(request) {
+  var key = hash(request);
+  this.timeMeasures[key].stop = process.hrtime();
+  this.timeMeasures[key].stopOld = new Date().getTime();
 };
 
 exports.CollaborationProject = CollaborationProject;
