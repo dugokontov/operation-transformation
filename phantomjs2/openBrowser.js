@@ -14,7 +14,7 @@ if (!args[1] || args[1].lastIndexOf('http') !== 0) {
 
 var timeMeasure = {};
 var actionIndex = -1;
-var timeBetweenActions = 150;
+var timeBetweenActions = 500;
 var clinetID;
 
 t = Date.now();
@@ -35,12 +35,7 @@ var runNextAction = function () {
     if (actionIndex < actions.length) {
       page.evaluate(function (action) {
         var element = $(action.selector);
-        if (action.jQueryAction) {
-          element[action.jQueryAction](action.params);
-        } else {
-          element = element[0];
-          TestUtils.Simulate[action.action](element, action.params);
-        }
+        TestUtils.Simulate[action.action](element, action.params);
       }, actions[actionIndex]);
       runNextAction();
     } else {
