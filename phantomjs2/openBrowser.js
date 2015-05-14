@@ -1,8 +1,16 @@
-/*global phantom, TestUtils, $, performance*/
+/*global phantom, TestUtils, $, performance, console*/
 'use strict';
 var page = require('webpage').create(),
   actions = require('./actions.json'),
   t, address;
+
+var system = require('system');
+var args = system.args;
+
+if (!args[1] || args[1].lastIndexOf('http') !== 0) {
+  console.error('second argument has to be URL');
+  phantom.exit();
+}
 
 var timeMeasure = {};
 var actionIndex = -1;
@@ -10,7 +18,7 @@ var timeBetweenActions = 150;
 var clinetID;
 
 t = Date.now();
-address = 'http://localhost:5555/project/615';
+address = args[1];
 page.open(address, function (status) {
   if (status !== 'success') {
     console.log('FAIL to load the address');
