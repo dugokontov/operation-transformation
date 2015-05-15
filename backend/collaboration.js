@@ -6,7 +6,7 @@ var collaborationProjects = {};
 
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({
-  port: 8080
+  port: 28735
 });
 
 var onEverybodyOut = function (tableID) {
