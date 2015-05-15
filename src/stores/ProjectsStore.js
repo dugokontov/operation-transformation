@@ -40,7 +40,7 @@ class ProjectsStore extends GLU.Store {
     }
 
     getProject(queryParams) {
-        this._socket = new WebSocket('ws://' + window.location.hostname + ':8080', queryParams.projectID);
+        this._socket = new WebSocket('ws://' + window.location.hostname + ':28735', queryParams.projectID);
         this._socket.onmessage = (event) => {
             this.ot.processRequest(event.data);
         };
