@@ -6,7 +6,7 @@ module.exports = function (grunt) {
         browserify: {
             app: {
                 src: ['src/app.js'],
-                dest: 'demo/js/app.bundle.js',
+                dest: 'compiled/js/app.bundle.js',
                 options: {
                     browserifyOptions: {
                         standalone: 'APP',
@@ -28,7 +28,7 @@ module.exports = function (grunt) {
                         var stream = through().pause().queue(src).end();
                         var buffer = '';
 
-                        stream.pipe(require('mold-source-map').transformSourcesRelativeTo(__dirname + '/demo/js')).pipe(through(function (chunk) {
+                        stream.pipe(require('mold-source-map').transformSourcesRelativeTo(__dirname + '/compiled/js')).pipe(through(function (chunk) {
                             buffer += chunk.toString();
                         }, function () {
                             next(err, buffer);
@@ -36,18 +36,34 @@ module.exports = function (grunt) {
                         stream.resume();
                     }
                 }
+            },
+            prod: {
+                src: ['src/app.js'],
+                dest: 'compiled/js/app.bundle.js',
+                options: {
+                    browserifyOptions: {
+                        standalone: 'APP',
+                        entry: 'src/app.js'
+                    },
+                    transform: [
+                        'babelify',
+                        [ 'detachkify', {
+                            relativeTo: __dirname + "/src"
+                        }]
+                    ]
+                }
             }
         },
         connect: {
             server: {
                 options: {
                     port: 5555,
-                    base: 'demo',
+                    base: 'compiled',
                     middleware: function (connect) {
                         var modRewrite = require('connect-modrewrite');
                         return [
                             modRewrite(['!\\.html|\\.js|\\.svg|\\.css|\\.png|\\.jpg|\\.ttf|\\.eot|\\.woff|\\.woff2$ /index.html [L]']),
-                            connect['static']('demo')
+                            connect['static']('compiled')
                         ];
                     }
                 }
@@ -71,30 +87,30 @@ module.exports = function (grunt) {
         injector: {
             options: {
                 template: "template.html",
-                destFile: "demo/index.html",
-                ignorePath: 'demo/',
+                destFile: "compiled/index.html",
+                ignorePath: 'compiled/',
                 addRootSlash: true
             },
             local_dependencies: {
                 files: {
-                    'demo/index.html': [
-                        'demo/css/bower.bundle.css',
-                        'demo/js/bower.bundle.js',
-                        'demo/js/app.bundle.js'
+                    'compiled/index.html': [
+                        'compiled/css/bower.bundle.css',
+                        'compiled/js/bower.bundle.js',
+                        'compiled/js/app.bundle.js'
                     ]
                 }
             }
         },
         bower_concat: {
             all: {
-                dest: 'demo/js/bower.bundle.js',
-                cssDest: 'demo/css/bower.bundle.css'
+                dest: 'compiled/js/bower.bundle.js',
+                cssDest: 'compiled/css/bower.bundle.css'
             }
         },
         bower: {
             fonts: {
-                dest: 'demo/',
-                fonts_dest: 'demo/',
+                dest: 'compiled/',
+                fonts_dest: 'compiled/',
                 skipPatterns: [
                     /^.*\.js$/i,
                     /^.*\.css$/i
@@ -107,7 +123,7 @@ module.exports = function (grunt) {
         copy: {
             assets: {
                 files: [
-                    {expand: true, cwd: 'assets/', src: ['**'], dest: 'demo/'}
+                    {expand: true, cwd: 'assets/', src: ['**'], dest: 'compiled/'}
                 ]
             }
         }
@@ -126,5 +142,6 @@ module.exports = function (grunt) {
 
     // Default task(s).
     grunt.registerTask('deploy', ['browserify', 'bower_concat', 'injector', 'bower:fonts', 'copy:assets']);
-    grunt.registerTask('dev', ['eslint', 'browserify', 'bower_concat', 'injector', 'bower:fonts', 'copy:assets', 'connect:server:keepalive']);
+    grunt.registerTask('dev', ['eslint', 'browserify:app', 'bower_concat', 'injector', 'bower:fonts', 'copy:assets', 'connect:server:keepalive']);
+    grunt.registerTask('prod', ['eslint', 'browserify:prod', 'bower_concat', 'injector', 'bower:fonts', 'copy:assets', 'connect:server:keepalive']);
 };
