@@ -8,6 +8,8 @@ import ProjectViewController from '/pages/project/ProjectViewController';
 
 let routes = new GLU.Router();
 
+routes.enableHashNavigation();
+
 routes.addRoute({
   path: '/',
   view: RootView,
