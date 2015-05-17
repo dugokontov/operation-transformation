@@ -19,22 +19,7 @@ module.exports = function (grunt) {
                             relativeTo: __dirname + "/src"
                         }]
                     ],
-                    watch: true,
-                    postBundleCB: function (err, src, next) {
-                        if (err) {
-                            throw err;
-                        }
-                        var through = require('through');
-                        var stream = through().pause().queue(src).end();
-                        var buffer = '';
-
-                        stream.pipe(require('mold-source-map').transformSourcesRelativeTo(__dirname + '/compiled/js')).pipe(through(function (chunk) {
-                            buffer += chunk.toString();
-                        }, function () {
-                            next(err, buffer);
-                        }));
-                        stream.resume();
-                    }
+                    watch: true
                 }
             },
             prod: {
