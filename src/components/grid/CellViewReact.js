@@ -22,9 +22,6 @@ class CellViewReact extends React.Component {
   }
 
   onBlur(event) {
-    if (event.target.value === this.props.cell) {
-      return;
-    }
     this.props.onValueChange({
       value: event.target.value,
       rowID: this.props.rowID,
