@@ -128,5 +128,5 @@ module.exports = function (grunt) {
     // Default task(s).
     grunt.registerTask('deploy', ['browserify', 'bower_concat', 'injector', 'bower:fonts', 'copy:assets']);
     grunt.registerTask('dev', ['eslint', 'browserify:app', 'bower_concat', 'injector', 'bower:fonts', 'copy:assets', 'connect:server:keepalive']);
-    grunt.registerTask('prod', ['eslint', 'browserify:prod', 'bower_concat', 'injector', 'bower:fonts', 'copy:assets', 'connect:server:keepalive']);
+    grunt.registerTask('compile', ['eslint', 'browserify:prod', 'bower_concat', 'injector', 'bower:fonts', 'copy:assets']);
 };

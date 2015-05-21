@@ -3,11 +3,14 @@
 var CollaborationProject = require('./CollaborationProject').CollaborationProject;
 
 var collaborationProjects = {};
+var port = 28735;
 
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({
-  port: 28735
+  port: port
 });
+
+console.log('web socket opened on port', port);
 
 var onEverybodyOut = function (tableID) {
   collaborationProjects[tableID] = undefined;

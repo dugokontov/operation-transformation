@@ -49,7 +49,7 @@ CollaborationProject.prototype.addClient = function (client) {
   });
 
   client.on('message', function (message) {
-    that.measureStart(JSON.parse(message));
+    that.takeTime(JSON.parse(message));
     ot.processRequest(message);
   });
 
@@ -82,7 +82,7 @@ CollaborationProject.prototype.destroy = function() {
     var elements = hash.split(',');
     var clinetPriority = elements[0];
     var status = elements.slice(1);
-    console.log(clinetPriority, status, that.timeDiff(that.timeMeasures[hash]).toFixed(0));
+    console.log(clinetPriority, status, that.timeDiff(that.timeMeasures[hash].times).join());
   });
   ot.setData(null);
   onEverybodyOut(this.tableID);
@@ -117,10 +117,12 @@ CollaborationProject.prototype.onUpdateCell = function(request) {
       value: actionData.value
     }
   }, function (response) {
+    that.takeTime(request);
     console.log('in response we got:', response);
     that.broadcast(JSON.stringify(request));
-    that.measureStop(request);
+    that.takeTime(request);
   });
+  this.takeTime(request);
 };
 
 var newTimeInMiliseconds = function (time) {
@@ -130,28 +132,31 @@ var newTimeInMiliseconds = function (time) {
   return timeInNanoseconds + (seconds * 1000);
 };
 
-CollaborationProject.prototype.timeDiff = function(timeMeasure) {
-  var oldTimeDiff = timeMeasure.stopOld - timeMeasure.startOld;
-  var newTimeStop = newTimeInMiliseconds(timeMeasure.stop);
-  var newTimeStart = newTimeInMiliseconds(timeMeasure.start);
-  var newTimeDiff = newTimeStop - newTimeStart;
+CollaborationProject.prototype.timeDiff = function(times) {
+  return times.slice(1).map(function (stop, index) {
+    var start = times[index];
+    var oldTimeDiff = stop.timeOld - start.timeOld;
 
-  return (oldTimeDiff + newTimeDiff) / 2;
+    var newTimeStop = newTimeInMiliseconds(stop.time);
+    var newTimeStart = newTimeInMiliseconds(start.time);
+    var newTimeDiff = newTimeStop - newTimeStart;
+
+    return ((oldTimeDiff + newTimeDiff) / 2).toFixed(2);
+  });
 };
 
-CollaborationProject.prototype.measureStart = function(request) {
+CollaborationProject.prototype.takeTime = function(request) {
   var key = hash(request);
-  this.timeMeasures[key] = {
-    action: request.action,
-    start: process.hrtime(),
-    startOld: new Date().getTime()
-  };
-};
-
-CollaborationProject.prototype.measureStop = function(request) {
-  var key = hash(request);
-  this.timeMeasures[key].stop = process.hrtime();
-  this.timeMeasures[key].stopOld = new Date().getTime();
+  if (!this.timeMeasures[key]) {
+    this.timeMeasures[key] = {
+      action: request.action,
+      times:[]
+    };
+  }
+  this.timeMeasures[key].times.push({
+    time: process.hrtime(),
+    timeOld: new Date().getTime()
+  });
 };
 
 exports.CollaborationProject = CollaborationProject;
