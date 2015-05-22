@@ -56,12 +56,11 @@ page.onConsoleMessage = function (msg) {
       var hash = msg.states.toString();
       if (!timeMeasure[hash]) {
         timeMeasure[hash] = {
-          start: when,
-          action: msg
+          times: [],
+          request: msg
         };
-      } else {
-        timeMeasure[hash].stop = when;
       }
+      timeMeasure[hash].times.push(when);
     }
   }
 };
@@ -70,8 +69,14 @@ var giveStatistic = function () {
   var stats = Object
     .keys(timeMeasure)
     .map(function (hash) {
-      var action = timeMeasure[hash];
-      return [action.stop - action.start, action.action.action].join();
+      var benchmark = timeMeasure[hash];
+      var times = benchmark.times;
+      return times
+        .slice(1)
+        .map(function(stop, startIndex) {
+          return (stop - times[startIndex]).toFixed(0);
+        })
+        .concat([benchmark.request.action]);
     }).join('\n');
 
   var fs = require('fs');

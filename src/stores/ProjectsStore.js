@@ -64,6 +64,7 @@ class ProjectsStore extends GLU.Store {
             this.ot.execute(request);
         }
         this._socket.send(message);
+        console.log(JSON.stringify(request));
         this.emitChange();
     }
 
