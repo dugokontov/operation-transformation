@@ -71,17 +71,26 @@ module.exports = function (grunt) {
         },
         injector: {
             options: {
-                template: "template.html",
-                destFile: "compiled/index.html",
+                template: 'template.html',
+                destFile: 'compiled/index.html',
                 ignorePath: 'compiled/',
                 addRootSlash: true
             },
-            local_dependencies: {
+            app: {
                 files: {
                     'compiled/index.html': [
                         'compiled/css/bower.bundle.css',
                         'compiled/js/bower.bundle.js',
                         'compiled/js/app.bundle.js'
+                    ]
+                }
+            },
+            prod: {
+                files: {
+                    'compiled/index.html': [
+                        'compiled/css/bower.bundle.css',
+                        'compiled/js/bower.bundle.js',
+                        'compiled/js/app.bundle.min.js'
                     ]
                 }
             }
@@ -111,6 +120,16 @@ module.exports = function (grunt) {
                     {expand: true, cwd: 'assets/', src: ['**'], dest: 'compiled/'}
                 ]
             }
+        },
+        uglify: {
+            compile: {
+                options: {
+                    mangle: false
+                },
+                files: {
+                    'compiled/js/app.bundle.min.js': ['compiled/js/app.bundle.js']
+                }
+            }
         }
     });
 
@@ -126,7 +145,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
 
     // Default task(s).
-    grunt.registerTask('deploy', ['browserify', 'bower_concat', 'injector', 'bower:fonts', 'copy:assets']);
-    grunt.registerTask('dev', ['eslint', 'browserify:app', 'bower_concat', 'injector', 'bower:fonts', 'copy:assets', 'connect:server:keepalive']);
-    grunt.registerTask('compile', ['eslint', 'browserify:prod', 'bower_concat', 'injector', 'bower:fonts', 'copy:assets']);
+    grunt.registerTask('deploy', ['browserify', 'bower_concat', 'injector:app', 'bower:fonts', 'copy:assets']);
+    grunt.registerTask('dev', ['eslint', 'browserify:app', 'bower_concat', 'injector:app', 'bower:fonts', 'copy:assets', 'connect:server:keepalive']);
+    grunt.registerTask('compile', ['eslint', 'browserify:prod', 'bower_concat', 'uglify', 'injector:prod', 'bower:fonts', 'copy:assets']);
 };
