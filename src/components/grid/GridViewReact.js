@@ -8,10 +8,11 @@ class GridViewReact extends React.Component {
   }
 
   render() {
-    let headers = this.props.columns.map(column => <th>{column.label}</th>);
-    headers.unshift(<th>#</th>);
+    let headers = this.props.columns.map(column => <th key={column.id}>{column.label}</th>);
+    headers.unshift(<th key="id">#</th>);
 
     let rows = this.props.data.map(row => <RowViewReact
+      key={row[0]}
       row={row}
       columns={this.props.columns}
       onValueChange={this.props.onValueChange}/>);
