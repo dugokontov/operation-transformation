@@ -1,5 +1,6 @@
 /*jslint node:true*/
 'use strict';
+var fs = require('fs');
 var initTable = require('./initTable');
 var requester = require('./request');
 var OT = require('../ot/ot');
@@ -78,13 +79,23 @@ CollaborationProject.prototype.removeClient = function (client) {
 CollaborationProject.prototype.destroy = function() {
   var that = this;
   // write results
-  Object.keys(this.timeMeasures).forEach(function (hash) {
-    var elements = hash.split(',');
-    var clinetPriority = elements[0];
-    var status = elements.slice(1);
-    console.log(clinetPriority, status, that.timeDiff(that.timeMeasures[hash].times).join());
-  });
+  var results = Object
+    .keys(this.timeMeasures)
+    .map(function (hash) {
+      var elements = hash.split(',');
+      var clinetPriority = elements[0];
+      var status = elements.slice(1);
+      return([clinetPriority].concat(that.timeDiff(that.timeMeasures[hash].times)));
+    })
+    .join('\n');
   ot.setData(null);
+  fs.writeFile('server.csv', results, function (err) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.log('Results saved in file server.csv');
+  });
   onEverybodyOut(this.tableID);
 };
 

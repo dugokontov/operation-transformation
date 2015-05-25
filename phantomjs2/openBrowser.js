@@ -12,6 +12,11 @@ if (!args[1] || args[1].lastIndexOf('http') !== 0) {
   phantom.exit();
 }
 
+if (!args[2]) {
+  console.error('third argument has to be region');
+  phantom.exit();
+}
+
 var timeMeasure = {};
 var actionIndex = -1;
 var timeBetweenActions = 500;
@@ -71,12 +76,15 @@ var giveStatistic = function () {
     .map(function (hash) {
       var benchmark = timeMeasure[hash];
       var times = benchmark.times;
+      if (!times || times.length === 0) {
+        return;
+      }
       return times
         .slice(1)
         .map(function(stop, startIndex) {
           return (stop - times[startIndex]).toFixed(0);
         })
-        .concat([benchmark.request.action]);
+        .concat(args[2]);
     }).join('\n');
 
   var fs = require('fs');

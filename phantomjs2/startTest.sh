@@ -1,6 +1,9 @@
-./phantomjs openBrowser.js &
-./phantomjs openBrowser.js &
-./phantomjs openBrowser.js &
-./phantomjs openBrowser.js &
-./phantomjs openBrowser.js &
-./phantomjs openBrowser.js &
+./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/615 BiH &
+./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/615 BiH &
+./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/615 BiH &
+./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/615 BiH &
+./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/615 BiH &
+./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/615 BiH &
+./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/615 BiH &
+./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/615 BiH &
+./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/615 BiH &
