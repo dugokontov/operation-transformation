@@ -16,6 +16,10 @@ var server = function () {
     dataFromServer.forEach(function (row) {
         var clientId = row[0];
         var clientReport = report[clientId];
+        if (!clientReport) {
+            console.error('Clinet', clientId, 'has not sent report');
+            return;
+        }
         if (whatRow[clientId] === undefined) {
             whatRow[clientId] = -1;
         }
