@@ -3,3 +3,4 @@ demo/
 compiled/
 phantomjs2/*.png
 phantomjs2/*.csv
+backend/server.csv
