@@ -15,6 +15,10 @@ class CellViewReact extends React.Component {
     });
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return (nextProps.cell !== this.props.cell) || nextState.value !== this.state.value;
+  }
+
   onChange(event) {
     this.setState({
       value: event.target.value
