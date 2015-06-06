@@ -1,4 +1,4 @@
-/*global phantom, TestUtils, $, performance, console*/
+/*global require, phantom, KeyboardEvent, $, performance, console*/
 'use strict';
 var page = require('webpage').create(),
   actions = require('./actions.json'),
@@ -40,7 +40,13 @@ var runNextAction = function () {
     if (actionIndex < actions.length) {
       page.evaluate(function (action) {
         var element = $(action.selector);
-        TestUtils.Simulate[action.action](element, action.params);
+        if (action.action === 'change') {
+          element.value = action.params;
+        } else {
+          var event = document.createEvent('KeyboardEvent');
+          event.initEvent('blur', true, true);
+          element.dispatchEvent(event);
+        }
       }, actions[actionIndex]);
       runNextAction();
     } else {
@@ -81,7 +87,7 @@ var giveStatistic = function () {
       }
       return times
         .slice(1)
-        .map(function(stop, startIndex) {
+        .map(function (stop, startIndex) {
           return (stop - times[startIndex]).toFixed(0);
         })
         .concat(args[2]);
