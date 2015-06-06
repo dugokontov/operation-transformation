@@ -48,7 +48,7 @@
   "action": "change",
   "params": {
     "target": {
-      "value": "Centar"
+      "value": 111001
     }
   }
 }, {
