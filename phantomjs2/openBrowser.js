@@ -95,6 +95,5 @@ var giveStatistic = function () {
 
   var fs = require('fs');
   fs.write(clinetID + '-test-results.csv', stats, 'w');
-  page.render(clinetID + '-page.png');
   phantom.exit();
 };
