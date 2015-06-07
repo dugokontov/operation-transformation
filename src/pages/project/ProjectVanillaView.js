@@ -2,6 +2,8 @@
 import GLU from 'glu.js';
 import TableActions from '/actions/TableActions';
 
+const getInputElementId = (rowID, columnID) => `c${rowID}-${columnID}`;
+
 class ProjectVanillaView extends GLU.View {
     constructor(root, selector) {
         super(root, selector);
@@ -12,8 +14,8 @@ class ProjectVanillaView extends GLU.View {
     }
 
     updateCell(lastChange) {
-        const inputId = `#c${lastChange.rowID}-${lastChange.columnID}`;
-        const input = this.el.querySelector(inputId);
+        const inputId = getInputElementId(lastChange.rowID, lastChange.columnID);
+        const input = document.getElementById(inputId);
         input.value = lastChange.value;
     }
 
@@ -46,7 +48,7 @@ class ProjectVanillaView extends GLU.View {
                     const input = document.createElement('input');
                     input.value = element;
                     input.setAttribute('type', 'text');
-                    input.id = `c${rowID}-${columnID}`;
+                    input.id = getInputElementId(rowID, columnID);
                     input.addEventListener('blur', event => {
                         this.onValueChange({
                             value: event.target.value,
