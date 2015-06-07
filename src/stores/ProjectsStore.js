@@ -44,7 +44,10 @@ class ProjectsStore extends GLU.Store {
         this._socket.onmessage = (event) => {
             this.ot.processRequest(event.data);
         };
-        var emitChange = () => this.emitChange();
+        var emitChange = (action) => {
+            this.lastChange = action.value;
+            this.emitChange();
+        };
         this.ot = new OT({
             onInit: emitChange,
             onUserPositionChange: emitChange
@@ -65,6 +68,7 @@ class ProjectsStore extends GLU.Store {
         }
         this._socket.send(message);
         console.log(JSON.stringify(request));
+        this.lastChange = request.value;
         this.emitChange();
     }
 

@@ -8,15 +8,19 @@ class ProjectViewController extends GLU.ViewController {
     constructor(view, params) {
         super(view);
 
-        this.view.project = null;
+        this.view.data = null;
         this.onParamsChange(params);
         ProjectsStore.onChange(this.onStoreChange, this);
         this.view.on(TableActions.UPDATE_CELL, TableActionCreator.updateCell);
     }
 
     onStoreChange() {
-        this.view.data = ProjectsStore.data;
-        this.view.render();
+        if (!this.view.data) {
+            this.view.data = ProjectsStore.data;
+            this.view.render();
+        } else {
+            this.view.updateCell(ProjectsStore.lastChange);
+        }
     }
 
     onParamsChange(params) {
