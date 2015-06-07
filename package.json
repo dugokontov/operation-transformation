@@ -10,7 +10,6 @@
     "csv-parse": "^0.1.1",
     "detachkify": "~0.0.4",
     "eslint": "~0.19.0",
-    "eslint-plugin-react": "~2.2.0",
     "grunt": "~0.4.5",
     "grunt-babel": "^4.0.0",
     "grunt-bower": "git+ssh://git@github.com/adnanh/grunt-bower.git",
@@ -25,7 +24,6 @@
     "grunt-injector": "~0.6.0",
     "mold-source-map": "^0.3.0",
     "open": "~0.0.5",
-    "react": "~0.13.1",
     "through": "^2.3.6",
     "ws": "^0.7.1",
     "yuidocjs": "^0.6.0"

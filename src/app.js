@@ -1,6 +1,5 @@
 import routes from './routes';
 import CurrentUserStore from './stores/CurrentUserStore';
-import React from 'react';
 
 let App = {
   init: function () {
