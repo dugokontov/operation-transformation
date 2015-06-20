@@ -12,7 +12,7 @@ var hash = function (request) {
   return request.priority + ',' + request.states.toString();
 };
 
-var CollaborationProject = function (tableID, onEverybodyOutCallback) {
+var CollaborationProject = function (tableID, onEverybodyOutCallback, activateOnThisManyUsers) {
   this.clients = [];
   this.tableID = tableID;
   this.clientsWaitingForData = [];
@@ -22,15 +22,15 @@ var CollaborationProject = function (tableID, onEverybodyOutCallback) {
   ot.setStates([]);
   this.priority = 0;
   this.timeMeasures = {};
+  this.activateOnThisManyUsers = activateOnThisManyUsers;
+  console.log('We have to wait for', activateOnThisManyUsers, 'users');
 
   var that = this;
 
   var onTableLoaded = function (table) {
     console.log('data is retrieved for', tableID);
     ot.setData(table);
-    that.clientsWaitingForData.forEach(function (client) {
-      that.sendInit(client);
-    });
+    
     that.clientsWaitingForData.length = 0;
   };
 
@@ -56,11 +56,18 @@ CollaborationProject.prototype.addClient = function (client) {
 
   // send data or add in waiting que
   client.priority = this.priority;
-  if (ot.getData()) {
-    this.sendInit(client);
-  } else {
-    this.clientsWaitingForData.push(client);
+  console.log(client.priority);
+  if (client.priority === this.activateOnThisManyUsers) {
+    console.log('sending data');
+    that.clients.forEach(function (client) {
+      that.sendInit(client);
+    });
   }
+  // if (ot.getData()) {
+  //   this.sendInit(client);
+  // } else {
+  //   this.clientsWaitingForData.push(client);
+  // }
 
   this.priority += 1;
 };
@@ -84,7 +91,7 @@ CollaborationProject.prototype.destroy = function() {
     .map(function (hash) {
       var elements = hash.split(',');
       var clinetPriority = elements[0];
-      var status = elements.slice(1);
+      // var status = elements.slice(1);
       return([clinetPriority].concat(that.timeDiff(that.timeMeasures[hash].times)));
     })
     .join('\n');

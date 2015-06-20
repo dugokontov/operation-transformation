@@ -16,10 +16,12 @@ var onEverybodyOut = function (tableID) {
   collaborationProjects[tableID] = undefined;
 };
 
+var activateOnThisManyUsers = process.argv[2] ? +process.argv[2] : 0;
+
 wss.on('connection', function (ws) {
   var tableID = ws.protocol;
   if (!collaborationProjects[tableID]) {
-    collaborationProjects[tableID] = new CollaborationProject(tableID, onEverybodyOut);
+    collaborationProjects[tableID] = new CollaborationProject(tableID, onEverybodyOut, activateOnThisManyUsers);
   }
   collaborationProjects[tableID].addClient(ws);
 });
