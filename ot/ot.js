@@ -178,12 +178,19 @@ OT.prototype.processRequest = function (r) {
       }
     }
   }
-  if (request.action === 'new-user' || (request.action !== 'before-init' && priority !== request.priority)) {
-      return;
-  }
   if (request.action === 'init') {
-      request = JSON.parse(JSON.stringify(request));
-      request.value.data = null;
+    request = JSON.parse(JSON.stringify(request));
+    request.value.data = null;
+  }
+  if (request.action === 'init' || request.action === 'before-init') {
+    console.log(JSON.stringify(request));
+    return;
+  }
+  if (request.action === 'new-user') {
+    return;
+  }
+  if (priority !== request.priority) {
+    return;
   }
   console.log(JSON.stringify(request));
 };
