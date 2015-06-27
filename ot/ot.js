@@ -123,6 +123,8 @@ var transform = function (newRequest, oldRequest) {
 OT.prototype.processRequest = function (r) {
   var request = JSON.parse(r);
   switch (request.action) {
+  case 'before-init':
+    break;
   case 'init':
     data = request.value.data;
     priority = request.value.priority;

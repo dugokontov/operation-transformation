@@ -23,12 +23,12 @@ var client = function (data, filename) {
         data = data.slice(1, 5);
     }
     for (var i = data.length - 1; i >= 0; i -= 1) {
-        if (data[i].length < 3) {
+        if (data[i].length < 4) {
             data.splice(i, 1);
             continue;
         }
-        if (data[i].length > 3) {
-            data[i].splice(0, data[i].length - 3);
+        if (data[i].length > 4) {
+            data[i].splice(0, data[i].length - 4);
         }
     }
     report[clientId] = data;
@@ -66,26 +66,28 @@ var printReport = function () {
                     // 0 - Client process time
                     // 1 - Client wait time
                     // 2 - Region
-                    // 3 - Server process time
-                    // 4 - Server wait time
-                    // 5 - Server send message
-                    // 6 - TableId
-                    // 7 - number of clients
+                    // 3 - Client init load time
+                    // 4 - Server process time
+                    // 5 - Server wait time
+                    // 6 - Server send message
+                    // 7 - TableId
+                    // 8 - number of clients
                     return [
                         clientId,
+                        row[3],
                         row[2],
-                        row[7],
-                        tableIdToTableSize[row[6]] || 1,
-                        (+row[0] + (row[1] - row[4])).toFixed(0)
+                        row[8],
+                        tableIdToTableSize[row[7]] || 1,
+                        (+row[0] + (row[1] - row[5])).toFixed(0)
                     ].join(',');
-                    // return clientId + ',' + row.join(',');
                 })
                 .join('\n');
         })
         .join('\n');
     if (!fs.existsSync(reportFile)) {
         var header = [
-            'clientId',
+            'Client Id',
+            'Client init load time',
             'Region',
             'Number of clients inside test',
             'Size of data',
@@ -156,7 +158,7 @@ fs.readdir(readFrom, function (err, folders) {
         return;
     }
     measuresList = folders.filter(function (folder) {
-       return /^\d+\-\d+$/.test(folder) && folder !== '1124-60';
+        return /^\d+\-\d+$/.test(folder);
     });
     createReportForMeasure();
     

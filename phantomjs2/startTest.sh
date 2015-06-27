@@ -1,9 +1,2 @@
-./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/1122 BiH &
-./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/1122 BiH &
-./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/1122 BiH &
-./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/1122 BiH &
-./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/1122 BiH &
-./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/1122 BiH &
-./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/1122 BiH &
-./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/1122 BiH &
-./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/1122 BiH &
+rm -f *.csv
+./phantomjs openBrowser.js http://dugokontov.noip.me/#/project/$1 US &

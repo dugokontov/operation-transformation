@@ -55,12 +55,17 @@ var runNextAction = function () {
   }, timeBetweenActions);
 };
 
+var beforeInitWaitTime;
+
 page.onConsoleMessage = function (msg) {
   console.log(msg);
   if (msg[0] === '{') {
     var when = performance.now();
     msg = JSON.parse(msg);
-    if (msg.action === 'init') {
+    if (msg.action === 'before-init') {
+      beforeInitWaitTime = when;
+    } else if (msg.action === 'init') {
+      beforeInitWaitTime = when - beforeInitWaitTime;
       clinetID = msg.value.priority;
       runNextAction();
     } else if (msg.priority === clinetID && msg.action !== 'user-change-position') {
@@ -90,7 +95,8 @@ var giveStatistic = function () {
         .map(function (stop, startIndex) {
           return (stop - times[startIndex]).toFixed(0);
         })
-        .concat(args[2]);
+        .concat(args[2])
+        .concat([beforeInitWaitTime.toFixed(0)]);
     }).join('\n');
 
   var fs = require('fs');

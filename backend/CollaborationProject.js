@@ -107,6 +107,10 @@ CollaborationProject.prototype.destroy = function() {
 };
 
 CollaborationProject.prototype.sendInit = function(client) {
+  client.send(ot.createMessage('before-init', {
+    states: ot.getStates(),
+    priority: client.priority
+  }));
   client.send(ot.createMessage('init', {
     data: ot.getData(),
     states: ot.getStates(),
