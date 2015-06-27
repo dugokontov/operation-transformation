@@ -178,6 +178,10 @@ OT.prototype.processRequest = function (r) {
       }
     }
   }
+  if (request.action === 'init') {
+      request = JSON.parse(JSON.stringify(request));
+      request.value.data = null;
+  }
   console.log(JSON.stringify(request));
 };
 
