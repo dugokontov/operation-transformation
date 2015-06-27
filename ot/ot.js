@@ -178,6 +178,9 @@ OT.prototype.processRequest = function (r) {
       }
     }
   }
+  if (request.action === 'new-user' || priority !== request.priority) {
+      return;
+  }
   if (request.action === 'init') {
       request = JSON.parse(JSON.stringify(request));
       request.value.data = null;
