@@ -34,7 +34,7 @@ class ProjectVanillaView extends GLU.View {
             thead.appendChild(tHeadRow);
             table.appendChild(thead);
             const tbody = document.createElement('tbody');
-            this.data.data.forEach((row) => {
+            this.data.data.slice(0, 100).forEach((row) => {
                 const tr = document.createElement('tr');
                 row.forEach((element, index) => {
                     const td = document.createElement('td');
