@@ -75,7 +75,10 @@ page.onConsoleMessage = function (msg) {
         };
       }
       timeMeasure[hash].times.push(when);
-      if (timeMeasure[hash].times.length > 2 && Object.keys(timeMeasure).length > 3) {
+      var canGiveStatistic = Object.keys(timeMeasure).length > 3 && Object.keys(timeMeasure).every(function(h) {
+        return timeMeasure[h].times.length > 2;
+      });
+      if (canGiveStatistic) {
         setTimeout(giveStatistic, 2000);
       }
     }
