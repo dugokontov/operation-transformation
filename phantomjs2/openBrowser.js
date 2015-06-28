@@ -49,8 +49,6 @@ var runNextAction = function () {
         }
       }, actions[actionIndex]);
       runNextAction();
-    } else {
-      setTimeout(giveStatistic, 2000);
     }
   }, timeBetweenActions);
 };
@@ -77,6 +75,9 @@ page.onConsoleMessage = function (msg) {
         };
       }
       timeMeasure[hash].times.push(when);
+      if (timeMeasure[hash].times.length > 2 && Object.keys(timeMeasure).length > 3) {
+        setTimeout(giveStatistic, 2000);
+      }
     }
   }
 };
